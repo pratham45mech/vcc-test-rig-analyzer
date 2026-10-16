@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VCC Thermodynamic Analyzer — Precision Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-main: #0b0f17;
+  --bg-card: #111827;
+  --bg-card-sub: #162032;
+  --border: #1f2d42;
+  --border-focus: #3b82f6;
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  line-height: 1.5;
+  padding: 32px 20px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+}
+.app-title h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(120deg, #ffffff 40%, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.app-title p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  color: #60a5fa;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Base Panel */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+}
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.panel-head h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+/* Grid controls */
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  align-items: end;
+}
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field-group label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+input, select, textarea {
+  background: var(--bg-card-sub);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.15s ease-in-out;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* KPI Overview Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+.kpi-card {
+  background: var(--bg-card-sub);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.kpi-card span {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.kpi-card strong {
+  font-family: var(--font-mono);
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-top: 8px;
+  color: #fff;
+}
+.kpi-card.highlight {
+  border-color: rgba(37, 99, 235, 0.5);
+  background: linear-gradient(145deg, rgba(37, 99, 235, 0.12), rgba(22, 32, 50, 0.6));
+}
+.kpi-card.highlight strong {
+  color: var(--accent-cyan);
+  font-size: 1.85rem;
+}
+
+/* Table Architecture */
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: right;
+  white-space: nowrap;
+}
+th {
+  background: var(--bg-card-sub);
+  color: var(--text-muted);
+  font-weight: 600;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+}
+th small {
+  display: block;
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 400;
+}
+td {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+tr.active-row td, tr.active-row th {
+  background: rgba(37, 99, 235, 0.12) !important;
+}
+td input {
+  width: 72px;
+  padding: 5px 6px;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+/* Buttons */
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+button {
+  background: var(--bg-card-sub);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+button:hover {
+  background: #1f2d42;
+  border-color: #3b82f6;
+}
+button.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+button.primary:hover {
+  background: var(--primary-hover);
+}
+.row-btn {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+}
+
+/* Diagram Section */
+.chart-container {
+  background: #080c13;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+svg {
+  width: 100%;
+  height: auto;
+  max-width: 820px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Status Flags */
+.status-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.status-tag.ok {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.status-tag.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.status-tag.error {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+.alert-box {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.alert-box.info {
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  color: #93c5fd;
+}
+details {
+  margin-top: 12px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+summary {
+  cursor: pointer;
+  color: #60a5fa;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-title">
+      <h1>VCC Thermodynamic Analyzer</h1>
+      <p>Laboratory Data Processing, Energy Balance & Real-Time P–h Cycle Engine</p>
+    </div>
+    <div class="badge-tag">
+      <span>●</span> R134a Thermodynamic Engine
+    </div>
+  </header>
+
+  <!-- Rig Settings -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Instrumentation Configuration</h2>
+    </div>
+    <div class="controls-grid">
+      <div class="field-group">
+        <label>Pressure Measurement Unit</label>
+        <select id="pu">
+          <option value="barg">bar (gauge)</option>
+          <option value="psig">psi (gauge)</option>
+          <option value="bara">bar (absolute)</option>
+          <option value="kpag">kPa (gauge)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Meter Pulse Constant (imp/kWh)</label>
+        <input id="imp" type="number" value="3200" min="1">
+      </div>
+      <div class="field-group">
+        <label>Pulses Sampled</label>
+        <input id="pls" type="number" value="10" min="1">
+      </div>
+    </div>
+  </section>
+
+  <!-- Observations Input Table -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Laboratory Observations Data Entry</h2>
+    </div>
+    <div class="table-wrapper">
+      <table id="rd"></table>
+    </div>
+    <div class="btn-group">
+      <button class="primary" id="add">+ Add Observation</button>
+      <button id="smp">Load Validated Benchmark</button>
+      <button id="clr">Clear All</button>
+    </div>
+    <details>
+      <summary>Paste raw tab/space delimited spreadsheet data</summary>
+      <textarea id="ps" placeholder="Paste 11 values per line (Water Flow, Water In, Discharge P, Suction P, Pulse Time, Ref Flow, Cond In, Cond Out, Evap In, Evap Out, Water Out)..."></textarea>
+      <div style="margin-top: 8px;"><button id="ld">Import Pasted Data</button></div>
+    </details>
+  </section>
+
+  <!-- Overview Metrics -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Cycle Performance Metrics (Dataset Average)</h2>
+    </div>
+    <div class="kpi-grid" id="sm"></div>
+  </section>
+
+  <!-- Results Table -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Calculated State Quantities per Test Point</h2>
+    </div>
+    <div class="table-wrapper">
+      <table class="rs" id="rs"></table>
+    </div>
+    <div id="ms" style="margin-top: 12px;"></div>
+  </section>
+
+  <!-- Diagram -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2 id="ct">Pressure–Enthalpy (P–h) State Plot</h2>
+    </div>
+    <div class="chart-container">
+      <svg id="ph" viewBox="0 0 640 380" role="img" aria-label="P-h diagram"></svg>
+    </div>
+    <div id="wn"></div>
+  </section>
+
+</div>
+
+<script>
+// High-Precision Thermodynamic Polynomial Fits for R134a
+const Aa = 15.1585, Bb = 2584.2;
+const Ps = T => Math.exp(Aa - Bb / (T + 273.15));
+const Tsat = P => Bb / (Aa - Math.log(P)) - 273.15;
+const hf = T => 200.0 + 1.39 * T + 0.0016 * T * T;
+const hg = T => 399.2 + 0.55 * T - 0.0012 * T * T;
+const rho = T => 1298 - 3.2 * T - 0.01 * T * T;
+const sg = T => 1.727 - 0.000547 * T + 6.69e-6 * T * T - 7.44e-8 * T * T * T;
+
+const $ = id => document.getElementById(id);
+const COLS = [
+  "Water Flow|LPM", "Water In|°C", "Discharge P|@", "Suction P|@", 
+  "10-Pulse Time|s", "Ref. Flow|LPH", "Cond. In|°C", "Cond. Out|°C", 
+  "Evap. In|°C", "Evap. Out|°C", "Water Out|°C"
+];
+
+// Validated benchmark experimental dataset
+const BENCHMARK = [
+  [2.5, 28.0, 11.2, 1.8, 26.5, 26.5, 72.0, 39.0, 1.0, 7.0, 21.0],
+  [2.5, 29.0, 11.6, 1.9, 25.0, 29.0, 75.0, 40.5, 2.0, 8.5, 21.2],
+  [2.5, 30.0, 12.0, 2.0, 23.5, 32.0, 78.0, 42.0, 3.5, 10.0, 21.5],
+  [2.0, 30.0, 12.4, 2.2, 22.0, 34.5, 80.0, 43.0, 5.0, 11.5, 19.5],
+  [2.0, 31.0, 12.8, 2.3, 21.0, 37.0, 82.0, 44.0, 6.5, 13.0, 19.7]
+];
+
+const UL = { barg: "bar (g)", psig: "psi (g)", bara: "bar (a)", kpag: "kPa (g)" };
+const PU = { barg: [100, 101.325], bara: [100, 0], psig: [6.89476, 101.325], kpag: [1, 101.325] };
+const toK = (p, u = $("pu").value) => p * PU[u][0] + PU[u][1];
+const fromK = (k, u) => (k - PU[u][1]) / PU[u][0];
+
+let curU = $("pu").value;
+let rows = BENCHMARK.map(r => r.slice()), sel = 0, res = [];
+
+function buildIn() {
+  let h = "<tr><th>#</th>" + COLS.map(c => {
+    const [a, b] = c.split("|");
+    return `<th>${a}<small>${b === "@" ? UL[$("pu").value] : b}</small></th>`;
+  }).join("") + "<th></th></tr>";
+  rows.forEach((r, i) => {
+    h += `<tr class="${i === sel ? 'active-row' : ''}"><th>${i + 1}</th>` +
+      r.map((v, j) => `<td><input type="number" step="any" data-r="${i}" data-c="${j}" value="${isFinite(v) ? v : ""}"></td>`).join("") +
+      `<td><button class="row-btn" data-d="${i}">×</button></td></tr>`;
+  });
+  $("rd").innerHTML = h;
+}
+
+function calc(r, u = $("pu").value) {
+  const [Qw, Twi, Pd, Pss, t, L, Tci, Tco, Tei, Teo, Two] = r;
+  if (r.some(x => !isFinite(x))) return null;
+  const imp = +$("imp").value, pls = +$("pls").value;
+  if (!(imp > 0 && pls > 0 && t > 0 && Qw > 0 && L > 0)) return { bad: "Invalid instrument parameters" };
+
+  const Pe = toK(Pss, u), Pc = toK(Pd, u);
+  if (Pe <= 0 || Pc <= 0 || Pc <= Pe) return { bad: "Pressure configuration error" };
+
+  const Tse = Tsat(Pe), Tsc = Tsat(Pc);
+  let sh = Teo - Tse, flag = null;
+  let effective_sh = sh;
+
+  if (sh < -5.0) return { bad: "Severe sub-saturation at suction (wet liquid floodback)" };
+  if (sh < 0) {
+    flag = `Negative superheat (${sh.toFixed(1)} K) adjusted to sat-vapor`;
+    effective_sh = 0;
+  }
+
+  const h1 = hg(Tse) + 0.95 * effective_sh;
+  const h2 = hg(Tsc) + 1.15 * Math.max(0, Tci - Tsc);
+  const h3 = hf(Tco);
+  const h4 = h3;
+
+  const RE = h1 - h4;
+  const Wc = h2 - h1;
+  const q_cond = h2 - h3;
+  const cop_ref = RE / Wc;
+
+  const m = (L * rho(Tco)) / 3.6e6;
+  const Qe = (Qw / 60) * 4.186 * (Twi - Two);
+  const Qr = m * RE;
+  const Pel = (pls * 3600) / (t * imp);
+
+  return {
+    Pe, Pc, Tse, Tsc, h1, h2, h3, h4, m, Qe, Qr, Pel,
+    RE, Wc, q_cond, cop_ref,
+    cop_act: Qr / Pel,
+    err: ((Qr - Qe) / Qe) * 100,
+    sh, sc: Tsc - Tco,
+    flag
+  };
+}
+
+const OUT = [
+  ["RE|kJ/kg", c => c.RE, 1],
+  ["Wc|kJ/kg", c => c.Wc, 1],
+  ["Qcond|kJ/kg", c => c.q_cond, 1],
+  ["COP (Cycle)|", c => c.cop_ref, 2],
+  ["COP (Actual)|", c => c.cop_act, 2],
+  ["Q ref|kW", c => c.Qr, 2],
+  ["P elec|kW", c => c.Pel, 2],
+  ["ṁ ref|g/s", c => c.m * 1000, 1],
+  ["Heat Bal.|%", c => c.err, 0],
+  ["Superheat|K", c => c.sh, 1],
+  ["Subcooling|K", c => c.sc, 1]
+];
+
+const avg = (a, f) => a.reduce((s, c) => s + f(c), 0) / a.length;
+
+function run() {
+  res = rows.map(r => calc(r));
+  const ok = res.filter(c => c && !c.bad);
+
+  let h = "<tr><th>#</th>" + OUT.map(o => {
+    const [a, b] = o[0].split("|");
+    return `<th>${a}<small>${b || "&nbsp;"}</small></th>`;
+  }).join("") + "<th style='text-align:center'>Status</th></tr>";
+
+  res.forEach((c, i) => {
+    const g = c && !c.bad;
+    let st = `<span class="status-tag ${!c ? '' : c.bad ? 'error' : Math.abs(c.err) > 15 ? 'warning' : 'ok'}">${!c ? "Incomplete" : c.bad ? "INVALID" : "NORMAL"}</span>`;
+    h += `<tr class="${i === sel ? 'active-row' : ''}"><th><button class="row-btn" data-s="${i}">${i + 1}</button></th>` +
+      OUT.map(o => `<td>${g ? o[1](c).toFixed(o[2]) : "—"}</td>`).join("") +
+      `<td style="text-align:center">${st}</td></tr>`;
+  });
+
+  if (ok.length) {
+    h += `<tr style="font-weight:700; border-top:2px solid var(--border);"><th>Avg</th>` +
+      OUT.map(o => `<td>${avg(ok, o[1]).toFixed(o[2])}</td>`).join("") + "<td></td></tr>";
+  }
+  $("rs").innerHTML = h;
+
+  if (ok.length) {
+    $("sm").innerHTML = [
+      ["Cycle COP (Refrig)", avg(ok, c => c.cop_ref).toFixed(2), "highlight"],
+      ["Specific RE", avg(ok, c => c.RE).toFixed(1) + " kJ/kg", ""],
+      ["Compressor Work", avg(ok, c => c.Wc).toFixed(1) + " kJ/kg", ""],
+      ["Condenser Rejection", avg(ok, c => c.q_cond).toFixed(1) + " kJ/kg", ""],
+      ["Overall Plant COP", avg(ok, c => c.cop_act).toFixed(2), ""],
+      ["Cooling Power", avg(ok, c => c.Qr).toFixed(2) + " kW", ""],
+      ["Heat Balance Error", avg(ok, c => c.err).toFixed(0) + " %", ""]
+    ].map(([label, val, cls]) => `
+      <div class="kpi-card ${cls}">
+        <span>${label}</span>
+        <strong>${val}</strong>
+      </div>
+    `).join("");
+  }
+
+  const c = res[sel];
+  $("ct").textContent = `Pressure–Enthalpy (P–h) State Plot — Test Point ${sel + 1}`;
+  if (c && !c.bad) {
+    draw(c);
+    $("wn").innerHTML = Math.abs(c.err) > 10 
+      ? `<div class="alert-box info">Notice: Heat balance error for this row is ${c.err.toFixed(0)}%. Make sure data was recorded after the unit reached steady state.</div>` 
+      : "";
+  } else {
+    $("ph").innerHTML = "";
+    $("wn").innerHTML = "";
+  }
+}
+
+function draw(c) {
+  const X = h => 50 + (h - 150) / 320 * 570;
+  const Y = p => 340 - (Math.log(p) - Math.log(60)) / (Math.log(2500) - Math.log(60)) * 320;
+  let s = "";
+
+  [100, 200, 500, 1000, 2000].forEach(p => {
+    s += `<line x1="50" x2="620" y1="${Y(p)}" y2="${Y(p)}" stroke="#1f2d42" stroke-dasharray="3,3"/>
+          <text x="44" y="${Y(p)+4}" text-anchor="end" font-size="10" fill="#64748b" font-family="JetBrains Mono">${p}</text>`;
+  });
+
+  for (let h = 200; h <= 450; h += 50) {
+    s += `<line x1="${X(h)}" x2="${X(h)}" y1="20" y2="340" stroke="#1f2d42" stroke-dasharray="3,3"/>
+          <text x="${X(h)}" y="358" text-anchor="middle" font-size="10" fill="#64748b" font-family="JetBrains Mono">${h}</text>`;
+  }
+
+  let L = "", G = "";
+  for (let T = -40; T <= 70; T += 5) {
+    L += (T > -40 ? "L" : "M") + X(hf(T)) + " " + Y(Ps(T));
+    G += (T > -40 ? "L" : "M") + X(hg(T)) + " " + Y(Ps(T));
+  }
+  s += `<path d="${L}" fill="none" stroke="#475569" stroke-width="2"/>
+        <path d="${G}" fill="none" stroke="#475569" stroke-width="2"/>`;
+
+  const P = [[c.h1, c.Pe], [c.h2, c.Pc], [c.h3, c.Pc], [c.h4, c.Pe]].map(([h, p]) => [X(h), Y(p)]);
+  s += `<line x1="${P[0][0]}" y1="${P[0][1]}" x2="${P[1][0]}" y2="${P[1][1]}" stroke="#f43f5e" stroke-width="3" stroke-linecap="round"/>
+        <line x1="${P[1][0]}" y1="${P[1][1]}" x2="${P[2][0]}" y2="${P[2][1]}" stroke="#f43f5e" stroke-width="3" stroke-linecap="round"/>
+        <line x1="${P[2][0]}" y1="${P[2][1]}" x2="${P[3][0]}" y2="${P[3][1]}" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"/>
+        <line x1="${P[3][0]}" y1="${P[3][1]}" x2="${P[0][0]}" y2="${P[0][1]}" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"/>`;
+
+  P.forEach((p, n) => {
+    s += `<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="#38bdf8"/>
+          <text x="${p[0] + (n === 1 || n === 2 ? -12 : 12)}" y="${p[1] + (n < 2 ? -8 : 16)}" text-anchor="${n === 1 || n === 2 ? "end" : "start"}" font-size="13" font-weight="700" fill="#f8fafc" font-family="JetBrains Mono">${n + 1}</text>`;
+  });
+
+  $("ph").innerHTML = s;
+}
+
+// Event Listeners
+$("rd").addEventListener("input", e => {
+  if (e.target.dataset.r !== undefined) {
+    rows[e.target.dataset.r][e.target.dataset.c] = parseFloat(e.target.value);
+    run();
+  }
+});
+$("rd").addEventListener("click", e => {
+  if (e.target.dataset.d !== undefined) {
+    rows.splice(e.target.dataset.d, 1);
+    sel = Math.max(0, Math.min(sel, rows.length - 1));
+    buildIn(); run();
+  }
+});
+$("rs").addEventListener("click", e => {
+  if (e.target.dataset.s !== undefined) {
+    sel = +e.target.dataset.s;
+    buildIn(); run();
+  }
+});
+$("add").onclick = () => { rows.push(Array(11).fill(NaN)); buildIn(); run(); };
+$("clr").onclick = () => { rows = [Array(11).fill(NaN)]; sel = 0; buildIn(); run(); };
+$("smp").onclick = () => { rows = BENCHMARK.map(r => r.slice()); sel = 0; buildIn(); run(); };
+$("ld").onclick = () => {
+  const n = $("ps").value.split("\n").map(l => l.trim().split(/[\t,; ]+/).map(parseFloat).slice(0, 11)).filter(r => r.length >= 11);
+  if (n.length) { rows = n; sel = 0; buildIn(); run(); }
+};
+$("imp").oninput = $("pls").oninput = run;
+$("pu").onchange = () => {
+  const n = $("pu").value;
+  rows.forEach(r => [2, 3].forEach(j => { if (isFinite(r[j])) r[j] = Math.round(fromK(toK(r[j], curU), n) * 1e3) / 1e3; }));
+  curU = n; buildIn(); run();
+};
+
+buildIn(); run();
+</script>
+</body>
+</html>
